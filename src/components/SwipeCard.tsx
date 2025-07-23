@@ -43,7 +43,7 @@ export default function SwipeCard() {
   // États de chargement et d'erreur
   if (isLoading) {
     return (
-      <div className="w-full max-w-sm min-h-[24rem] h-[80vh] max-h-96 bg-[#fefcf8] border border-[#e8e4d8] rounded-2xl flex flex-col items-center justify-center p-8">
+      <div className="w-full max-w-sm h-screen bg-[#fefcf8] border border-[#e8e4d8] rounded-2xl flex flex-col items-center justify-center p-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8b7d6b] mx-auto mb-4"></div>
           <p className="text-[#8b7d6b] font-light">Chargement des questions...</p>
@@ -54,7 +54,7 @@ export default function SwipeCard() {
 
   if (isError || !cardsData) {
     return (
-      <div className="w-full max-w-sm min-h-[24rem] h-[80vh] max-h-96 bg-[#fefcf8] border border-[#e8e4d8] rounded-2xl flex flex-col items-center justify-center p-8">
+      <div className="w-full max-w-sm h-screen bg-[#fefcf8] border border-[#e8e4d8] rounded-2xl flex flex-col items-center justify-center p-8">
         <div className="text-center">
           <p className="text-[#8b7d6b] font-light mb-4">Erreur lors du chargement</p>
           <button 
@@ -73,7 +73,7 @@ export default function SwipeCard() {
   // Si plus de cartes, afficher les réponses
   if (!currentCard) {
     return (
-      <div className="w-full max-w-sm min-h-[24rem] h-[80vh] max-h-96 bg-[#fefcf8] border border-[#e8e4d8] rounded-2xl flex flex-col items-center justify-center p-8">
+      <div className="w-full max-w-sm h-screen bg-[#fefcf8] border border-[#e8e4d8] rounded-2xl flex flex-col items-center justify-center p-8">
         <h2 className="text-lg font-light text-[#2d2a24] mb-8 tracking-wide">tes choix</h2>
         <div className="space-y-6 w-full">
           {answers.map((answer: string, index: number) => {
@@ -107,7 +107,7 @@ export default function SwipeCard() {
         animate={controls}
         initial={{ x: 0, rotate: 0, opacity: 1, scale: 1 }}
         whileDrag={{ scale: 1.02 }}
-        className="w-full min-h-[24rem] h-[80vh] max-h-96 bg-[#fefcf8] border border-[#e8e4d8] rounded-2xl flex flex-col items-center justify-center relative touch-none select-none cursor-grab active:cursor-grabbing"
+        className="w-full h-screen bg-[#fefcf8] border border-[#e8e4d8] rounded-2xl flex flex-col items-center justify-center relative touch-none select-none cursor-grab active:cursor-grabbing"
       >
         {/* Indicateurs de direction - style zen avec icônes */}
         <div className="absolute top-6 left-6 text-[#8b7d6b] text-sm font-light tracking-wide flex items-center gap-2">
