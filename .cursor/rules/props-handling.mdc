@@ -1,0 +1,82 @@
+---
+description: Convention de gestion des props dans les composants React (typages, spread, children, asChild)
+globs: src/components/**/*.{tsx,jsx}
+alwaysApply: true
+---
+
+# Rule 2.3 – Gestion des props dans les composants React (props-handling)
+
+## Objectif
+
+Standardiser la gestion des props dans tous les composants pour garantir lisibilité, flexibilité, accessibilité et réutilisabilité du code UI.
+
+## Technologies concernées
+
+- React (TSX/JSX)
+- ShadCN/UI
+- TailwindCSS v4+
+
+## Principes
+
+- Toujours définir explicitement un `type Props = {}` même pour des composants simples.
+- Toujours **utiliser le spread `...props`** sur l’élément racine pour permettre l’extension.
+- Les composants doivent accepter `children` par défaut sauf cas très spécifiques.
+- Pour les composants utilisant ShadCN, utiliser `asChild` quand on doit wrapper un `Link`, `span`, ou autre élément personnalisé.
+- Le `className` est toujours fusionné via `clsx`, `cn` ou `classnames`, jamais écrasé.
+- Ne jamais désactiver l’héritage d’accessibilité (`role`, `aria-*`) sauf raison claire.
+
+## Exemple – Bon composant typé avec `...props` + `children`
+
+```tsx
+import { cn } from "@/lib/utils";
+
+type Props = React.HTMLAttributes<HTMLDivElement> & {
+  variant?: "default" | "highlighted";
+};
+
+export const Section = ({ children, className, variant = "default", ...props }: Props) => {
+  return (
+    <section
+      className={cn(
+        "px-4 py-2 rounded-md",
+        variant === "highlighted" && "bg-muted",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </section>
+  );
+};
+```
+
+## Exemple avec `asChild` (ShadCN)
+
+```tsx
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+
+export const DashboardLink = () => {
+  return (
+    <Button asChild>
+      <Link to="/dashboard">Dashboard</Link>
+    </Button>
+  );
+};
+```
+
+## Bonnes pratiques
+
+- Ne jamais hardcoder `className="..."` sans permettre override via props
+- Si `className` est conditionnel, utiliser `cn()` ou `clsx()` avec logique claire
+- Toujours documenter les variantes ou props spécifiques (ex : `variant`, `size`, `icon`)
+- Pour les éléments natifs (`button`, `a`, `input`), toujours étendre le bon type (`React.ButtonHTMLAttributes`, etc.)
+
+## Règle d’or
+
+Tout composant doit :
+– être typé,  
+– supporter `children`,  
+– permettre un `className` externe,  
+– et propager `...props` proprement sur l’élément racine.  
+C’est la base d’un composant réutilisable.

@@ -1,0 +1,67 @@
+---
+description: Convention d’accessibilité clavier pour tous les composants interactifs dans une interface React
+globs: src/**/*.{tsx,jsx}
+alwaysApply: true
+---
+
+# Rule 3.3 – Accessibilité clavier des composants interactifs (keyboard-accessibility)
+
+## Objectif
+
+Garantir que tous les composants interactifs (boutons, cartes cliquables, drag & drop, tooltips, etc.) soient entièrement utilisables au clavier et conformes aux bonnes pratiques d’accessibilité.
+
+## Technologies concernées
+
+- React (TSX/JSX)
+- TailwindCSS v4+
+- ShadCN/UI
+- @dnd-kit (si interactions custom)
+
+## Principes
+
+- Tout élément interactif **doit être focusable** au clavier : `tabIndex={0}` minimum si ce n’est pas un `button`, `input` ou `a`.
+- Tout élément réagissant à `onClick` doit également gérer `onKeyDown` (ou `onKeyUp`) pour valider par la touche `Enter` ou `Space`.
+- Utiliser des éléments sémantiques (`button`, `a`, `input`) quand c’est possible, au lieu de `div`.
+- Si l’interaction est purement décorative (ex : SVG cliquable mais non essentiel), elle doit être `aria-hidden="true"`.
+
+## Exemple – Carte cliquable focusable
+
+```tsx
+<div
+  tabIndex={0}
+  role="button"
+  aria-label="Voir les détails du client"
+  onClick={handleOpen}
+  onKeyDown={(e) => {
+    if (e.key === "Enter" || e.key === " ") handleOpen();
+  }}
+  className="cursor-pointer rounded-lg border px-4 py-3 hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+>
+  <h3 className="text-lg font-medium">Client VIP</h3>
+</div>
+```
+
+## Bonnes pratiques
+
+- Utiliser `focus-visible:outline-none` et `focus-visible:ring-2` pour afficher un feedback clavier clair
+- Tous les composants ShadCN (Dialog, Popover, Tooltip, Tabs…) ont déjà un bon support clavier — l’utiliser systématiquement
+- Gérer `onKeyDown` pour les `Enter` / `Space` uniquement sur les `div` ou éléments non standards
+- Si un composant custom agit comme un bouton, ajouter `role="button"` et `aria-label="..."`
+
+## Vérifications recommandées
+
+- Naviguer uniquement au clavier (Tab / Shift+Tab) : est-ce que tout est atteignable ?
+- Touche `Escape` ferme les modals, popovers, overlays ?
+- Le focus est-il visible ? Revenu à un endroit logique après fermeture ?
+- Les `DragHandle`, boutons, toggles, tabs… sont-ils tous accessibles sans souris ?
+
+## Accessibilité dans le drag & drop
+
+- Ajouter un `KeyboardSensor` avec `@dnd-kit` pour permettre les déplacements clavier
+- Fournir une alternative ou fallback en cas de navigation non souris (ex : bouton “Déplacer vers le haut”)
+
+## Règle d’or
+
+Tout ce qui se clique doit pouvoir se tabuler.  
+Tout ce qui se ferme doit réagir à Escape.  
+Tout ce qui est focusable doit le montrer.

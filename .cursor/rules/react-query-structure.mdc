@@ -1,0 +1,96 @@
+---
+description: Convention de structure et de nommage des hooks react-query pour la gestion des requêtes et mutations dans l’application
+globs: src/lib/hooks/**/*.{ts,tsx}
+alwaysApply: true
+---
+
+# Rule 4.3 – Structure des hooks React Query (react-query-structure)
+
+## Objectif
+
+Structurer tous les appels de données (fetch, mutation, invalidate) via `react-query` dans des hooks dédiés, cohérents, typés et facilement réutilisables. Garantir lisibilité, séparation des responsabilités et scalabilité.
+
+## Technologies concernées
+
+- React (TSX)
+- @tanstack/react-query
+- Supabase (via fetcher ou SDK)
+- Zod (optionnel pour validation de réponse)
+
+## Principes
+
+- Chaque ressource (table, module, objet métier) a ses propres hooks : `useGuests`, `useGuest`, `useCreateGuest`, etc.
+- Les hooks sont stockés dans `src/lib/hooks/[module]/` ou `src/hooks/[entity]/`
+- Toutes les clés de requête sont **centralisées dans un objet ou fichier unique** : `queryKeys.ts`
+- Toutes les requêtes doivent être **typées** en entrée et en sortie
+- Les mutations doivent **invalider** les caches liés (via `queryClient.invalidateQueries`)
+- Les erreurs doivent être capturées avec un toast UX (`onError` + `toast.error()`)
+
+## Exemple – Fichier queryKeys.ts
+
+```ts
+export const guestKeys = {
+  all: ["guests"] as const,
+  list: () => [...guestKeys.all, "list"] as const,
+  detail: (id: string) => [...guestKeys.all, "detail", id] as const,
+};
+```
+
+## Exemple – useGuests.ts
+
+```ts
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+import { guestKeys } from "@/lib/queryKeys";
+
+export const useGuests = () => {
+  return useQuery({
+    queryKey: guestKeys.list(),
+    queryFn: async () => {
+      const { data, error } = await supabase.from("guests").select("*");
+      if (error) throw error;
+      return data;
+    }
+  });
+};
+```
+
+## Exemple – useCreateGuest.ts
+
+```ts
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+import { guestKeys } from "@/lib/queryKeys";
+import { toast } from "sonner";
+
+export const useCreateGuest = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: { full_name: string }) => {
+      const { error } = await supabase.from("guests").insert([payload]);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(guestKeys.list());
+      toast.success("Invité ajouté avec succès");
+    },
+    onError: () => {
+      toast.error("Erreur lors de l’ajout de l’invité");
+    }
+  });
+};
+```
+
+## Bonnes pratiques
+
+- Les hooks ne doivent contenir **aucune logique UI** (pas de `useState`, `useEffect` interne)
+- Les hooks doivent retourner uniquement les objets `data`, `isLoading`, `isError`, `mutate`, etc.
+- Les mutations utilisent toujours `useMutation`, jamais un `fetch` manuel dans un composant
+- Les erreurs sont toujours gérées avec feedback utilisateur, même dans les tests
+
+## Règle d’or
+
+Une requête = un hook.  
+Un hook = typé, isolé, cache-friendly, et auto-invalidant.  
+Aucun appel de données ne doit être codé dans un composant.

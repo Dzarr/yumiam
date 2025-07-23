@@ -1,0 +1,84 @@
+---
+description: Convention d’intégration et d’organisation du drag & drop avec @dnd-kit dans une application React
+globs: src/**/*.{tsx,jsx}
+alwaysApply: true
+---
+
+# Rule 3.1 – Intégration de @dnd-kit dans React (dnd-kit-usage)
+
+## Objectif
+
+Fournir une structure claire, accessible et maintenable pour implémenter des interfaces drag & drop avec `@dnd-kit`, tout en respectant les bonnes pratiques d’architecture et d’UX.
+
+## Technologies concernées
+
+- React (TSX/JSX)
+- @dnd-kit/core
+- @dnd-kit/sortable
+- TailwindCSS v4+
+
+## Principes
+
+- Toujours encapsuler l’ensemble de la zone draggable dans un composant `DndContext`
+- Utiliser `SortableContext` pour les listes réordonnables
+- Utiliser des `sensors` personnalisés pour gérer le clavier, la souris et le tactile
+- Ne jamais mélanger logique de drag & logique métier → séparer les composants UI et les hooks de gestion
+- Chaque élément draggable doit avoir une `id` stable et explicite (`"table-01"`, `"guest-42"`, etc.)
+- Gérer les overlays et previews via `DragOverlay` uniquement
+
+## Exemple de structure
+
+```tsx
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay
+} from "@dnd-kit/core";
+
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+
+const TablePlanner = () => {
+  const sensors = useSensors(useSensor(PointerSensor));
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext items={items} strategy={verticalListSortingStrategy}>
+        {items.map((id) => (
+          <DraggableItem key={id} id={id} />
+        ))}
+      </SortableContext>
+
+      <DragOverlay>
+        {activeId ? <Preview id={activeId} /> : null}
+      </DragOverlay>
+    </DndContext>
+  );
+};
+```
+
+## Bonnes pratiques
+
+- Toujours créer un hook `useDnDState()` ou `useDnDSort()` pour centraliser les handlers et états (`activeId`, `items`, etc.)
+- Gérer le `DragOverlay` dans le même composant que le `DndContext`, mais extraire les éléments visuels dans un composant dédié (`<Preview />`)
+- Ne jamais manipuler directement `event.active.id` dans le JSX : le normaliser d’abord dans un hook ou un mapper
+- Éviter les IDs implicites (`index`, `array.map(i)`) → utiliser des IDs métier (`table.id`, `guest.id`)
+- Le feedback visuel pendant le drag doit être clair (opacité réduite, z-index augmenté, curseur personnalisé si pertinent)
+
+## Accessibilité
+
+- Utiliser `KeyboardSensor` en plus du `PointerSensor` pour permettre navigation clavier
+- Ajouter `aria-label` ou `aria-roledescription` sur les éléments drag
+- Éviter les drag exclusifs à la souris
+
+## Règle d’or
+
+Toute interaction drag & drop doit être encapsulée proprement dans un `DndContext`, avec sensors explicites, états isolés, et feedback UX clair.  
+Si tu codes un `drag`, tu codes aussi un `overlay`, un `aria-label`, et une gestion clavier.

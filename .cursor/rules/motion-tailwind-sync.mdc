@@ -1,0 +1,109 @@
+---
+description: Convention de synchronisation des durées et easings entre Tailwind CSS et Framer Motion via des tokens partagés
+globs: src/styles/tokens.css, src/**/*.{tsx,jsx}
+alwaysApply: true
+---
+
+# Rule 7.3 – Harmonisation Tailwind × Framer Motion (motion-tailwind-sync)
+
+## Objectif
+
+Aligner les valeurs d’animation (durée, easing, delay) entre **Framer Motion** et **Tailwind CSS**, en centralisant tous les timings dans un même fichier de tokens CSS.  
+Résultat : une UI fluide, cohérente et maintenable, où tous les mouvements parlent le même langage.
+
+## Technologies concernées
+
+- Tailwind CSS v4+
+- Framer Motion (`@motion.dev/react`)
+- tokens.css (design system CSS-first)
+
+---
+
+## Tokens recommandés dans `tokens.css`
+
+```css
+@layer tokens {
+  :root {
+    /* Durations */
+    --duration-fast: 0.15s;
+    --duration-base: 0.3s;
+    --duration-slow: 0.6s;
+
+    /* Easings */
+    --easing-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --easing-in: cubic-bezier(0.4, 0, 1, 1);
+    --easing-smooth: cubic-bezier(0.33, 1, 0.68, 1);
+  }
+}
+```
+
+---
+
+## Usage côté Tailwind (ex: hover)
+
+```tsx
+<button className="transition duration-[--duration-fast] ease-[--easing-out] hover:scale-105">
+  Survol
+</button>
+```
+
+---
+
+## Usage côté Framer Motion
+
+```tsx
+<motion.div
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{
+    duration: parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--duration-base")),
+    ease: [0.22, 1, 0.36, 1] // correspond à --easing-out
+  }}
+>
+  Bloc animé
+</motion.div>
+```
+
+---
+
+## Bonus : helper JS (optionnel)
+
+```ts
+// motion/tokens.ts
+export const tokens = {
+  duration: {
+    fast: 0.15,
+    base: 0.3,
+    slow: 0.6,
+  },
+  easing: {
+    out: [0.22, 1, 0.36, 1],
+    in: [0.4, 0, 1, 1],
+    smooth: [0.33, 1, 0.68, 1],
+  },
+};
+```
+
+Utilisation :
+
+```tsx
+<motion.div
+  transition={{ duration: tokens.duration.base, ease: tokens.easing.out }}
+/>
+```
+
+---
+
+## Bonnes pratiques
+
+- Tous les `duration`, `ease`, `delay` doivent venir des **tokens**
+- Ne jamais écrire `duration: 0.27` ou `ease: "linear"` sans justification
+- Garder les noms des tokens **abstraits** et réutilisables (`--duration-base`, pas `--duration-fade`)
+- Si besoin de transition globale : appliquer sur les layouts (`motion.div layout`)
+
+---
+
+## Règle d’or
+
+Une bonne animation n’est pas qu’un mouvement. C’est un tempo.  
+Et ce tempo, c’est ton design system qui doit le donner.

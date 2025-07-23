@@ -1,0 +1,80 @@
+---
+description: Convention de nommage, structure de fichiers et bonnes pratiques pour les composants React avec TailwindCSS
+globs: src/components/**/*.{tsx,jsx}
+alwaysApply: true
+---
+
+# Rule 2.1 – Nommage et structure des composants UI (React + Tailwind)
+
+## Objectif
+
+Assurer une organisation claire, prévisible et évolutive des composants dans l’arborescence du projet. Faciliter la réutilisabilité, le typage et la cohérence de nommage dans toute la base code.
+
+## Technologies concernées
+
+- React (TSX/JSX)
+- TailwindCSS v4+
+- ShadCN/UI
+
+## Principes
+
+- Un composant = un fichier `.tsx` unique (pas de `.js`, pas de `.css`)
+- Le nom du composant doit être **en PascalCase** et identique au nom du fichier.
+- Aucun `export default` : uniquement des `export const`.
+- Les composants sont stockés dans des dossiers thématiques ou fonctionnels (`/components/ui`, `/components/layout`, `/components/planner`, etc.)
+- Les composants génériques (UI) vont dans `/components/ui/`, les composants métier (feature) dans des dossiers dédiés.
+
+## Exemple d’arborescence
+
+```txt
+src/
+  components/
+    ui/
+      Button.tsx
+      Input.tsx
+    layout/
+      Header.tsx
+      Sidebar.tsx
+    planner/
+      GuestCard.tsx
+      TableLayout.tsx
+```
+
+## Bonnes pratiques
+
+- Ne jamais créer plusieurs composants dans un seul fichier.
+- Si un composant utilise d’autres sous-composants internes : les extraire dans un fichier `SubComponent.tsx` ou `parts/`.
+- Utiliser un dossier dédié (`/components/forms/LoginForm.tsx`) plutôt qu’un fichier à la racine si le composant est lié à une fonctionnalité.
+- Éviter les noms génériques (`Box`, `Container`) hors usage strictement layout.
+- Tous les composants doivent être typés (`type Props = { ... }`).
+
+## À éviter
+
+```tsx
+// ⛔ Mauvais
+export default function guestcard() {
+  return <div>Guest</div>;
+}
+
+// ⛔ Mauvais
+const Button = () => { return <button>Click</button> };
+export default Button;
+```
+
+## Recommandé
+
+```tsx
+// ✅ Bon
+export type GuestCardProps = {
+  name: string;
+};
+
+export const GuestCard = ({ name }: GuestCardProps) => {
+  return <div className="text-lg">{name}</div>;
+};
+```
+
+## Règle d’or
+
+- Si un composant est utilisé plus de 3 fois ou partage des styles avec d’autres, il doit être extrait et nommé proprement dans `/components/`.  
+- Son nom doit toujours refléter sa fonction (ex : `GuestCard`, `TableCell`, `PlannerSidebar`).

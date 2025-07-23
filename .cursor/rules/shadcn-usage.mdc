@@ -1,0 +1,63 @@
+---
+globs: src/components/**/*.tsx
+alwaysApply: true
+---
+# Rule 1.2 – Utilisation de ShadCN UI (React + Tailwind)
+
+## Objectif
+
+Standardiser l’utilisation des composants ShadCN pour garantir la cohérence, l’accessibilité et la maintenabilité de l’interface.
+
+## Technologies concernées
+
+- React (TSX)
+- TailwindCSS
+- ShadCN/UI
+- Lucide Icons (combinés)
+
+## Principes
+
+- Utiliser ShadCN pour les composants de base : `Button`, `Input`, `Dialog`, `Popover`, `Tabs`, etc.
+- Ne jamais modifier les composants source dans `@/components/ui/`, mais les **étendre** dans un composant local si besoin.
+- Toujours passer par les slots fournis (`asChild`, `children`, etc.) pour insérer des composants personnalisés.
+- Préférer la version typée (`ButtonProps`) si tu crées une version surchargée d’un composant.
+
+## Exemple minimal (Button)
+
+```tsx
+import { Button } from "@/components/ui/button";
+
+export const SubmitButton = () => {
+  return (
+    <Button type="submit" className="w-full">
+      Valider
+    </Button>
+  );
+};
+```
+
+## Exemple avec `asChild` pour wrapper un `Link`
+
+```tsx
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+
+export const LinkButton = () => {
+  return (
+    <Button asChild>
+      <Link to="/dashboard">Aller au dashboard</Link>
+    </Button>
+  );
+};
+```
+
+## Bonnes pratiques
+
+- Si tu réutilises un composant avec des variantes ou des icônes, crée un composant wrapper dans `/components/ui/` ou `/components/custom/`
+- Toujours intégrer les icônes avec `Lucide` via `import { IconName } from "lucide-react"` et positionner avec Tailwind (`me-2`, `size-4`, etc.)
+- Si tu ajoutes des animations ou des effets, privilégie les API fournies par ShadCN (transitions, overlays…) avant d’en ajouter manuellement
+- Respecter les props d’accessibilité ShadCN (`aria-label`, `role`, etc.)
+
+## Règle d’or
+
+Tout composant ShadCN doit être utilisé dans sa version typée, accessible, et surchargé uniquement via extension, jamais en modifiant le code source.

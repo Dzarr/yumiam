@@ -1,0 +1,113 @@
+---
+description: Convention d’accessibilité des animations avec Framer Motion – support de `prefers-reduced-motion`, gestion du focus, et UX non bloquante
+globs: src/**/*.{tsx,jsx}
+alwaysApply: true
+---
+
+# Rule 7.4 – Accessibilité des animations Motion (motion-accessibility)
+
+## Objectif
+
+Assurer une expérience utilisateur fluide et inclusive en respectant les préférences système (`prefers-reduced-motion`), en évitant les animations perturbantes, et en garantissant une accessibilité complète (focus, navigation clavier, lecteurs d’écran).
+
+## Technologies concernées
+
+- Framer Motion (`@motion.dev/react`)
+- Tailwind CSS
+- React
+- tokens.css (facultatif)
+
+---
+
+## 1. Support de `prefers-reduced-motion`
+
+Détection via Media Query :
+
+```ts
+const shouldReduceMotion = window.matchMedia(
+  "(prefers-reduced-motion: reduce)"
+).matches;
+```
+
+Ou avec hook personnalisé :
+
+```ts
+import { useEffect, useState } from "react";
+
+export const useReducedMotion = () => {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(media.matches);
+    const handler = () => setReduced(media.matches);
+    media.addEventListener("change", handler);
+    return () => media.removeEventListener("change", handler);
+  }, []);
+  return reduced;
+};
+```
+
+---
+
+## 2. Adapter les animations
+
+```tsx
+const prefersReduced = useReducedMotion();
+
+<motion.div
+  animate={prefersReduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
+  initial={prefersReduced ? false : { opacity: 0, y: 20 }}
+  transition={prefersReduced ? undefined : { duration: 0.3 }}
+>
+  Élément accessible
+</motion.div>
+```
+
+---
+
+## 3. Focus et navigation
+
+- Les composants animés (modals, tooltips, drawers) doivent :
+  - Recevoir le **focus automatiquement** si interactifs
+  - Être fermables au clavier (Escape)
+  - **Masquer l’arrière-plan** aux lecteurs d’écran (`aria-hidden`, `inert`)
+
+Exemple pour un modal :
+
+```tsx
+<Dialog open={isOpen}>
+  <DialogContent
+    autoFocus
+    initialFocus
+    onEscapeKeyDown={handleClose}
+    className="z-[var(--z-modal)]"
+  >
+    Contenu focusable
+  </DialogContent>
+</Dialog>
+```
+
+---
+
+## 4. Animations non bloquantes
+
+- Ne jamais bloquer une action utilisateur avec une animation (ex: empêcher un clic le temps du `exit`)
+- Ne jamais piéger le focus dans un composant animé (sauf dans un `Dialog`)
+- Ne jamais animer les couleurs de fond en loop ou en rapid-fire (danger pour les personnes épileptiques)
+
+---
+
+## Bonnes pratiques
+
+- Ajouter un toggle `disableAnimation` dans le `localStorage` ou le `context` pour forcer la désactivation manuelle (utile en dev/test)
+- Documenter tous les `motion.*` critiques avec un commentaire d’accessibilité si nécessaire
+- Préférer `opacity`, `transform`, `scale`, `clipPath` → éviter les animations sur `height`, `width`, `top`, `left` si non nécessaires
+- Si un composant peut animer ET bloquer le focus : gérer le cycle via `AnimatePresence` ou `exitBeforeEnter`
+
+---
+
+## Règle d’or
+
+Une animation doit **aider l’utilisateur**, pas le distraire ni le freiner.  
+Si l’utilisateur demande moins de mouvement, **respecte-le par défaut**.  
+L’accessibilité n’est pas un bonus UX. C’est la base.

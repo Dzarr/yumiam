@@ -1,0 +1,81 @@
+---
+description: Règles d’intégration des icônes Lucide dans une application React avec TailwindCSS et ShadCN UI
+globs: src/**/*.{tsx,jsx}
+alwaysApply: true
+---
+
+# Rule 1.4 – Utilisation des icônes Lucide avec React + Tailwind + ShadCN
+
+## Objectif
+
+Standardiser l’utilisation des icônes Lucide pour garantir une cohérence visuelle, une bonne accessibilité et une intégration simple dans tous les composants de l’interface.
+
+## Technologies concernées
+
+- React (TSX/JSX)
+- TailwindCSS v4+
+- ShadCN/UI
+- Lucide-react
+
+## Principes
+
+- Les icônes doivent toujours être importées depuis `lucide-react`, jamais depuis des fichiers SVG statiques ni d'autres bibliothèques.
+- Une icône = un composant inline. Jamais de balise `<svg>` manuelle ou de lien externe.
+- La taille par défaut est `size={16}` ou `size={18}` selon le contexte (16 dans les labels, 18 dans les boutons).
+- La couleur de l’icône est gérée via Tailwind (`text-muted-foreground`, `text-primary`, `text-destructive`, etc.)
+- Ne jamais utiliser d’`inline-style` (`style={{ color: "#000" }}`) ni de CSS externe.
+
+## Exemple minimal
+
+```tsx
+import { Calendar } from "lucide-react";
+
+export const DateLabel = () => {
+  return (
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <Calendar size={16} />
+      <span>14 juillet 2025</span>
+    </div>
+  );
+};
+```
+
+## Exemple dans un bouton ShadCN
+
+```tsx
+import { Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+export const SettingsButton = () => {
+  return (
+    <Button variant="ghost" size="icon" aria-label="Ouvrir les paramètres">
+      <Settings className="size-4 text-muted-foreground" />
+    </Button>
+  );
+};
+```
+
+## Bonnes pratiques
+
+- Pour les icônes avec texte, ajouter un `className="me-2 size-4"` sur l’icône.
+- Pour les boutons avec **icône seule**, ajouter un `aria-label` obligatoire.
+- Pour les icônes décoratives uniquement, ajouter `aria-hidden="true"` si aucun rôle n’est attendu.
+- Si besoin d’une variante colorée (ex : état actif), passer par `className` Tailwind conditionnel, pas par des classes custom.
+
+## À éviter
+
+```tsx
+// ⛔ Mauvais : SVG manuel
+<svg viewBox="0 0 24 24">...</svg>
+
+// ⛔ Mauvais : import depuis un asset local
+import CalendarIcon from "../assets/calendar.svg";
+
+// ⛔ Mauvais : inline-style
+<Calendar style={{ color: "#999" }} />
+```
+
+## Règle d’or
+
+- Toute icône affichée à l’écran provient de `lucide-react`, stylée via Tailwind, et respecte les règles d’accessibilité.  
+- Pas de SVG custom, pas d’image, pas de code couleur hors design system.

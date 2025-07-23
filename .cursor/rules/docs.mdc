@@ -1,0 +1,65 @@
+---
+description: Convention de documentation du projet dans des fichiers Markdown versionnés dans le dossier `docs/`
+globs: docs/**/*.md
+alwaysApply: true
+---
+
+# Rule 7.1 – Documentation projet (`docs/structure`)
+
+## Objectif
+
+Structurer une documentation claire, synthétique et versionnée du projet directement dans un dossier `docs/`, afin d’aligner tous les contributeurs, faciliter la prise en main, la maintenance et la scalabilité.
+
+## Technologies concernées
+
+- Markdown
+- React / Vite / Supabase / Tailwind
+- Git
+
+## Emplacement
+
+Tous les fichiers de documentation doivent vivre dans un dossier `/docs` à la racine du projet.  
+Ce dossier est versionné dans Git, au même titre que le code source.
+
+## Arborescence recommandée
+
+```txt
+docs/
+  ├── index.md                 # Page d’accueil / résumé du projet
+  ├── stack.md                # Stack technique (librairies utilisées, version)
+  ├── routes.md               # Arborescence des routes de l’app
+  ├── api.md                  # Structure et règles des appels Supabase
+  ├── data-model.md           # Tables, types, relations, policies RLS
+  ├── design-system.md        # Règles visuelles (couleurs, tokens, typographies)
+  ├── components.md           # Liste des composants UI + description
+  ├── conventions.md          # Règles de nommage, bonnes pratiques
+  └── changelog.md            # Journal des modifications importantes
+```
+
+## Exemple de fichier stack.md
+# Stack technique
+
+- Framework : React 18 + Vite + TypeScript
+- CSS : Tailwind CSS v4 (mode tokens CSS-first)
+- Composants UI : ShadCN
+- Drag & Drop : @dnd-kit
+- Auth + DB : Supabase
+- State / async : React Query (TanStack)
+- Animations : Framer Motion
+
+## Bonnes pratiques
+Un fichier .md = un sujet clair
+Utiliser un titre # unique par fichier
+Utiliser des listes, tableaux, arbres, liens
+Garder chaque fichier lisible en 30 secondes
+Toujours versionner dans Git avec les branches de dev
+Ne pas multiplier les fichiers inutiles : aller à l’essentiel
+
+## Accessibilité
+Tous les fichiers doivent pouvoir être lus hors contexte : pas besoin d’ouvrir le code
+Pas d’outils externes requis (pas de Notion, Google Docs…)
+Prévoir un index.md pour guider l’entrée dans le projet
+
+## Règle d’or
+Un bon projet vit dans son /src.
+Un excellent projet s’explique dans son /docs.
