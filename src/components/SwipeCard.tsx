@@ -4,7 +4,6 @@ import { motion, useAnimation } from 'framer-motion';
 import { useState } from 'react';
 import { useQuestions } from '@/hooks/useQuestions';
 import type { Question } from '@/types/questions';
-import { cn } from '../lib/utils';
 
 export default function SwipeCard() {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);

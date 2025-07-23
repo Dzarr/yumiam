@@ -1,13 +1,4 @@
-import { useState } from "react";
-import { ArrowRight, ArrowLeft } from "lucide-react";
 import SwipeCard from "./SwipeCard";
-
-interface YumiamCardProps {
-  title: string;
-  subtitle: string;
-  onSwipeRight?: () => void;
-  onSwipeLeft?: () => void;
-}
 
 
 export default function Cards() {
