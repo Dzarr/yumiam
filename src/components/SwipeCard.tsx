@@ -26,7 +26,7 @@ export default function SwipeCard() {
   });
 
   // Utiliser le hook pour récupérer l'ID du pattern (seulement si on a des réponses)
-  const { data: patternData, isLoading: patternLoading, isError: patternError } = useAnswerPattern(numericPattern, cardsData?.length || 0);
+  const { data: patternData, isLoading: patternLoading } = useAnswerPattern(numericPattern, cardsData?.length || 0);
 
   // Utiliser le hook pour récupérer les noms de recettes basés sur le pattern_id
   const { data: recipeNames, isLoading: recipesLoading, isError: recipesError } = useRecipeNames(patternData?.id || null);
